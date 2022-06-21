@@ -9,6 +9,7 @@
 #include <QGraphicsScene>
 #include <QGraphicsView>
 #include <QGraphicsRectItem>
+#include <spdlog/spdlog.h>
 #include "tile_stats.hpp"
 #include "tiff_tiled_file.hpp"
 
@@ -59,12 +60,19 @@ int main(int argc, char * argv[]) {
 	QApplication app{argc, argv};
 	QGraphicsScene scene{QRectF{0, 0, 256, 256}};
 
+	tiff_tiled_file tiff{"/home/ja/gis/data/landsat8/LC08_L2SP_191025_20210615_20210622_02_T1/LC08_L2SP_191025_20210615_20210622_02_T1_SR_B1.TIF"};
+	tile_item * tile1 = new tile_item{tiff, 300};
+	scene.addItem(tile1);
+
+	tile_item * tile2 = new tile_item{tiff, 301};
+	scene.addItem(tile2);
+
+	// for testing purpose
 	QGraphicsRectItem * rectItem = scene.addRect(QRectF{10, 10, 50, 100});
 	QGraphicsEllipseItem * elItem = scene.addEllipse(QRectF{80, 40, 100, 80});
 
-	tiff_tiled_file tiff{"/home/ja/gis/data/landsat8/LC08_L2SP_191025_20210615_20210622_02_T1/LC08_L2SP_191025_20210615_20210622_02_T1_SR_B1.TIF"};
-	tile_item * tile = new tile_item{tiff, 300};
-	scene.addItem(tile);
+	QRectF rect_bound = rectItem->boundingRect();
+	spdlog::info("rect-bound={0}, {1}, {2}, {3}", rect_bound.x(), rect_bound.y(), rect_bound.width(), rect_bound.height());  // << rectTtem->boundingRect();
 
 	QGraphicsView view;
 	view.setBackgroundBrush(Qt::white);
