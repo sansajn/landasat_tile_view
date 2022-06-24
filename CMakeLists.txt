@@ -14,6 +14,10 @@ find_package(spdlog 1.9.2 REQUIRED)
 
 add_executable(ltview
 	main.cpp
+	tile_item.hpp
+	tile_item.cpp
+	tile_grid.cpp
+	tile_grid.hpp
 	tile_stats.cpp
 	tile_stats.hpp
 	tiff_tiled_file.hpp
