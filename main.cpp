@@ -11,8 +11,10 @@
 #include <QGraphicsView>
 #include <QGraphicsRectItem>
 #include <QMainWindow>
+#include <QMouseEvent>
 #include <spdlog/spdlog.h>
 #include "tile_item.hpp"
+#include "tile_grid.hpp"
 #include "tiff_tiled_file.hpp"
 
 using std::array, std::vector, std::pair, std::byte;
@@ -30,6 +32,15 @@ constexpr char app_title[] = "ltview (Landsat Tile Viewer)";
 constexpr int default_zvalue = 100;
 
 
+class CustomGraphicsView : public QGraphicsView {
+protected:
+	void mouseMoveEvent(QMouseEvent * event) override {  //!< \note left mouse button must be pressed to receive event
+		QPoint pos = event->pos();  // pozicia vo widgete
+		spdlog::info("mouse moved: view-pos=({},{})", pos.x(), pos.y());
+		QGraphicsView::mouseMoveEvent(event);
+	}
+};
+
 
 int main(int argc, char * argv[]) {
 	QApplication app{argc, argv};
@@ -46,10 +57,14 @@ int main(int argc, char * argv[]) {
 
 	spdlog::info("tile-count-x={0}, tile-count-y={1}", tile_count_x, tile_count_y);
 
+	vector<tile_item *> tiles;
+	tiles.reserve(tile_count_y * tile_count_y);
+
 	// populate window part scene by tile items
 	for (size_t y = 0; y < tile_count_y; ++y) {
 		for (size_t x = 0; x < tile_count_x; ++x) {
 			tile_item * tile = new tile_item{tiff, 300};  // TODO: handle tile-idx
+			tiles.push_back(tile);
 			QTransform T;
 			T.translate(x * tile_size, y * tile_size);
 			tile->setTransform(T);  // TODO: can we create translate transformation by kind of translated() function?
@@ -57,10 +72,12 @@ int main(int argc, char * argv[]) {
 		}
 	}
 
+	tile_grid grid{tile_count_y, tile_count_x, tiles.front()};
+
 	// for testing purpose
 	scene.addEllipse(QRectF{-4, -4, 8, 8}, QPen{Qt::blue}, Qt::blue);  // origin (0,0) point mark
 
-	QGraphicsView view;
+	CustomGraphicsView view;
 	view.setBackgroundBrush(Qt::white);
 	view.setScene(&scene);
 
