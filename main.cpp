@@ -77,13 +77,20 @@ protected:
 			QPointF dp = event->pos() - _mouse_click_pos;
 			spdlog::info("view moved by: ({},{})", dp.x(), dp.y());
 			// TODO: we want there to change tile positions for testing purpose
+
+			for (tile_item * tile : _tiles) {
+				QTransform T;
+				T.translate(dp.x(), dp.y());
+				tile->setTransform(T, true);  // NOTE: we assume there is not any rotation there
+			}
+
 		}
 
 		QGraphicsView::mouseReleaseEvent(event);
 	}
 
 private:
-	void pan_by(QPointF pos);  //!< translate/pan view by \c pos position
+	void pan_by(QPointF pos);  //!< translate/pan view by \c pos position TODO: implement
 
 	QPointF _mouse_click_pos;
 	vector<tile_item *> _tiles;  //!< list of tiles visible in view
