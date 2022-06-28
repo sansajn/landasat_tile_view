@@ -32,13 +32,61 @@ constexpr char app_title[] = "ltview (Landsat Tile Viewer)";
 constexpr int default_zvalue = 100;
 
 
-class CustomGraphicsView : public QGraphicsView {
+class map_graphics_view : public QGraphicsView {
+public:
+	map_graphics_view(size_t width, size_t height, tiff_tiled_file const & tiff, QGraphicsScene & scene) {
+		// populate view by tile items
+		size_t const tile_count_x = ceil((float)width / tile_size),
+			tile_count_y = ceil((float)height / tile_size);
+
+		_tiles.reserve(tile_count_y * tile_count_y);
+
+		for (size_t y = 0; y < tile_count_y; ++y) {
+			for (size_t x = 0; x < tile_count_x; ++x) {
+				tile_item * tile = new tile_item{tiff, 300};  // TODO: handle tile-idx
+				_tiles.push_back(tile);
+				QTransform T;
+				T.translate(x * tile_size, y * tile_size);
+				tile->setTransform(T);  // TODO: can we create translate transformation by kind of translated() function?
+				scene.addItem(tile);
+			}
+		}
+	}
+
 protected:
-	void mouseMoveEvent(QMouseEvent * event) override {  //!< \note left mouse button must be pressed to receive event
+	void mouseMoveEvent(QMouseEvent * event) override {  //!< \note left/right/midddle mouse button must be pressed to receive event
 		QPoint pos = event->pos();  // pozicia vo widgete
-		spdlog::info("mouse moved: view-pos=({},{})", pos.x(), pos.y());
+		QPointF screen_pos = event->screenPos();
+		spdlog::info("mouse moved: view-pos=({},{}), screen-pos=({},{})", pos.x(), pos.y(), screen_pos.x(), screen_pos.y());
+
 		QGraphicsView::mouseMoveEvent(event);
 	}
+
+	void mousePressEvent(QMouseEvent * event) override {
+		QPointF local_pos = event->localPos();
+		spdlog::info("mouse button clicked at: local-pos=({},{})", local_pos.x(), local_pos.y());
+
+		_mouse_click_pos = event->localPos();
+
+		QGraphicsView::mousePressEvent(event);
+	}
+
+	void mouseReleaseEvent(QMouseEvent * event) override {
+		if (_mouse_click_pos != QPointF{}) {
+			setTransformationAnchor(QGraphicsView::NoAnchor);
+			QPointF dp = event->pos() - _mouse_click_pos;
+			spdlog::info("view moved by: ({},{})", dp.x(), dp.y());
+			// TODO: we want there to change tile positions for testing purpose
+		}
+
+		QGraphicsView::mouseReleaseEvent(event);
+	}
+
+private:
+	void pan_by(QPointF pos);  //!< translate/pan view by \c pos position
+
+	QPointF _mouse_click_pos;
+	vector<tile_item *> _tiles;  //!< list of tiles visible in view
 };
 
 
@@ -57,27 +105,10 @@ int main(int argc, char * argv[]) {
 
 	spdlog::info("tile-count-x={0}, tile-count-y={1}", tile_count_x, tile_count_y);
 
-	vector<tile_item *> tiles;
-	tiles.reserve(tile_count_y * tile_count_y);
-
-	// populate window part scene by tile items
-	for (size_t y = 0; y < tile_count_y; ++y) {
-		for (size_t x = 0; x < tile_count_x; ++x) {
-			tile_item * tile = new tile_item{tiff, 300};  // TODO: handle tile-idx
-			tiles.push_back(tile);
-			QTransform T;
-			T.translate(x * tile_size, y * tile_size);
-			tile->setTransform(T);  // TODO: can we create translate transformation by kind of translated() function?
-			scene.addItem(tile);
-		}
-	}
-
-	tile_grid grid{tile_count_y, tile_count_x, tiles.front()};
-
 	// for testing purpose
 	scene.addEllipse(QRectF{-4, -4, 8, 8}, QPen{Qt::blue}, Qt::blue);  // origin (0,0) point mark
 
-	CustomGraphicsView view;
+	map_graphics_view view{scene_w, scene_h, tiff, scene};
 	view.setBackgroundBrush(Qt::white);
 	view.setScene(&scene);
 
