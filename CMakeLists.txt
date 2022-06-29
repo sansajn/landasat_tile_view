@@ -30,6 +30,7 @@ add_executable(ltview
 )
 
 add_executable(test
+	test.cpp
 	test_grid.cpp
 )
 

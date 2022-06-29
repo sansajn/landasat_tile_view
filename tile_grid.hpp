@@ -17,6 +17,7 @@ public:
 	void move_front_row_back();
 	void move_back_row_front();
 	void move_front_column_back();
+	void move_back_column_front();
 
 private:
 	using grid_row = std::deque<Tile *>;
@@ -97,5 +98,14 @@ void tile_grid<Tile>::move_front_column_back() {
 		Tile * tile = row.front();
 		row.pop_front();
 		row.push_back(tile);
+	}
+}
+
+template <typename Tile>
+void tile_grid<Tile>::move_back_column_front() {
+	for (grid_row & row : _tiles) {  // TODO: can we use transform there?
+		Tile * tile = row.back();
+		row.pop_back();
+		row.push_front(tile);
 	}
 }

@@ -1,15 +1,9 @@
+// unit tests for tile_grid implementation
 #include <vector>
-#define CATCH_CONFIG_MAIN
 #include <catch.hpp>
 #include "tile_grid.hpp"
 
 using std::vector;
-
-TEST_CASE("we can test with catch2", "[catch]") {
-	REQUIRE(true);
-}
-
-// unit tests for tile_grid implementation
 
 TEST_CASE("tile_grid: we can create grid from list of tiles",
 	"[tile_grid") {
@@ -99,10 +93,8 @@ TEST_CASE("tile_grid: we can move row of tiles",
 	}
 }
 
-TEST_CASE("we can move front column tiles to back",
-	"[x][tile_grid]") {
-	// TODO: implement
-
+TEST_CASE("tile_grid: we can move column of tiles",
+	"[tile_grid]") {
 	// SETUP
 	int tiles[4] = {1, 2, 3, 4};
 	vector<int *> tile_list{
@@ -115,11 +107,15 @@ TEST_CASE("we can move front column tiles to back",
 		expected_back_col{&tiles[0], &tiles[2]};
 
 	// ACT & CHECK
-	grid.move_front_column_back();
-	REQUIRE(grid.front_column() == expected_front_col);
-	REQUIRE(grid.back_column() == expected_back_col);
-}
+	SECTION("from front to back") {
+		grid.move_front_column_back();
+		REQUIRE(grid.front_column() == expected_front_col);
+		REQUIRE(grid.back_column() == expected_back_col);
+	}
 
-TEST_CASE("we can move back column tiles to front") {
-	// TODO: implement
+	SECTION("from back to front") {
+		grid.move_back_column_front();
+		REQUIRE(grid.front_column() == expected_front_col);
+		REQUIRE(grid.back_column() == expected_back_col);
+	}
 }
