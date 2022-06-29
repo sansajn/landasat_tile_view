@@ -5,10 +5,12 @@
 #include <cassert>
 
 /*! Grid of tiles on scren.
-Tile grid structure to support moving tiles on screen while map scrolling/panning. */
+Tile grid structure to support moving tiles on screen while map scrolling/panning.
+\note Tiles are now owned after creation. */
 template <typename Tile>
 class tile_grid {
 public:
+	tile_grid() = default;
 	tile_grid(size_t rows, size_t cols, Tile * tiles);  // TODO: do not use raw pointers there, using tiles is error prome
 	std::vector<Tile *> front_row() const;
 	std::vector<Tile *> back_row() const;
