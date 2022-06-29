@@ -36,7 +36,7 @@ class map_graphics_view : public QGraphicsView {  // TODO: move to map_view modu
 public:
 	map_graphics_view(size_t width, size_t height, tiff_tiled_file const & tiff, QGraphicsScene & scene) {
 		// populate view by tile items
-		size_t const tile_count_x = ceil((float)width / tile_size),
+		size_t const tile_count_x = ceil((float)width / tile_size),  // TODO: use more tiles to suppor smooth scrolling
 			tile_count_y = ceil((float)height / tile_size);
 
 		_tiles.reserve(tile_count_y * tile_count_y);
@@ -83,7 +83,7 @@ protected:
 	}
 
 private:
-	void pan_by(QPointF pos);  //!< translate/pan view by \c pos position TODO: implement
+	void pan_by(QPointF pos);  //!< Translate/pan view by \c pos position.
 
 	QPointF _mouse_click_pos;
 	vector<index_tile_item *> _tiles;  //!< list of tiles visible in view
@@ -96,6 +96,8 @@ void map_graphics_view::pan_by(QPointF pos) {
 		T.translate(pos.x(), pos.y());
 		tile->setTransform(T, true);  // NOTE: we assume there is not any rotation there
 	}
+
+	// TODO: reshape tiles ...
 }
 
 
