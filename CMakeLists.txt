@@ -17,6 +17,8 @@ add_compile_options(-Wall -Wextra)  # add extra warnings
 
 add_executable(ltview
 	main.cpp
+	map_view.cpp
+	map_view.hpp
 	tile_item.hpp
 	tile_item.cpp
 	tile_grid.cpp

@@ -32,7 +32,7 @@ constexpr char app_title[] = "ltview (Landsat Tile Viewer)";
 constexpr int default_zvalue = 100;
 
 
-class map_graphics_view : public QGraphicsView {
+class map_graphics_view : public QGraphicsView {  // TODO: move to map_view module
 public:
 	map_graphics_view(size_t width, size_t height, tiff_tiled_file const & tiff, QGraphicsScene & scene) {
 		// populate view by tile items
@@ -57,7 +57,14 @@ protected:
 	void mouseMoveEvent(QMouseEvent * event) override {  //!< \note left/right/midddle mouse button must be pressed to receive event
 		QPoint pos = event->pos();  // pozicia vo widgete
 		QPointF screen_pos = event->screenPos();
-		spdlog::info("mouse moved: view-pos=({},{}), screen-pos=({},{})", pos.x(), pos.y(), screen_pos.x(), screen_pos.y());
+		QPointF position = event->position();
+		spdlog::info("mouse moved: view-pos=({},{}), screen-pos=({},{}), position=({},{})", pos.x(), pos.y(), screen_pos.x(), screen_pos.y(), position.x(), position.y());
+
+		QPointF dp = event->position() - _mouse_click_pos;
+		if (dp != QPointF{}) {
+			pan_by(dp);
+			_mouse_click_pos = event->position();
+		}
 
 		QGraphicsView::mouseMoveEvent(event);
 	}
@@ -72,20 +79,6 @@ protected:
 	}
 
 	void mouseReleaseEvent(QMouseEvent * event) override {
-		if (_mouse_click_pos != QPointF{}) {
-			setTransformationAnchor(QGraphicsView::NoAnchor);
-			QPointF dp = event->pos() - _mouse_click_pos;
-			spdlog::info("view moved by: ({},{})", dp.x(), dp.y());
-			// TODO: we want there to change tile positions for testing purpose
-
-			for (index_tile_item * tile : _tiles) {
-				QTransform T;
-				T.translate(dp.x(), dp.y());
-				tile->setTransform(T, true);  // NOTE: we assume there is not any rotation there
-			}
-
-		}
-
 		QGraphicsView::mouseReleaseEvent(event);
 	}
 
@@ -95,6 +88,15 @@ private:
 	QPointF _mouse_click_pos;
 	vector<index_tile_item *> _tiles;  //!< list of tiles visible in view
 };
+
+
+void map_graphics_view::pan_by(QPointF pos) {
+	for (index_tile_item * tile : _tiles) {
+		QTransform T;
+		T.translate(pos.x(), pos.y());
+		tile->setTransform(T, true);  // NOTE: we assume there is not any rotation there
+	}
+}
 
 
 int main(int argc, char * argv[]) {
