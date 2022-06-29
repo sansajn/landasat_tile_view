@@ -11,6 +11,7 @@ find_package(Qt6 REQUIRED COMPONENTS Widgets)
 find_package(TIFF 4.3.0 REQUIRED)
 find_package(Boost 1.74 REQUIRED)
 find_package(spdlog 1.9.2 REQUIRED)
+find_package(Catch2 2.13 REQUIRED)
 
 add_executable(ltview
 	main.cpp
@@ -24,6 +25,10 @@ add_executable(ltview
 	tiff_tiled_file.cpp
 	checker.cpp
 	checker.hpp
+)
+
+add_executable(test
+	test_grid.cpp
 )
 
 target_link_libraries(ltview PRIVATE Qt6::Widgets TIFF::TIFF spdlog::spdlog)
