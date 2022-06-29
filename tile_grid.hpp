@@ -5,7 +5,7 @@
 #include <cassert>
 
 /*! Grid of tiles on scren.
-The structure can handle operations with grid of tiles visible on screen. */
+Tile grid structure to support moving tiles on screen while map scrolling/panning. */
 template <typename Tile>
 class tile_grid {
 public:
@@ -16,6 +16,7 @@ public:
 	std::vector<Tile *> back_column() const;
 	void move_front_row_back();
 	void move_back_row_front();
+	void move_front_column_back();
 
 private:
 	using grid_row = std::deque<Tile *>;
@@ -88,4 +89,13 @@ void tile_grid<Tile>::move_back_row_front() {
 	grid_row back = _tiles.back();
 	_tiles.pop_back();
 	_tiles.push_front(std::move(back));
+}
+
+template <typename Tile>
+void tile_grid<Tile>::move_front_column_back() {
+	for (grid_row & row : _tiles) {  // TODO: can we use transform there?
+		Tile * tile = row.front();
+		row.pop_front();
+		row.push_back(tile);
+	}
 }

@@ -73,7 +73,7 @@ TEST_CASE("tile_grid: we can get column of tiles",
 }
 
 TEST_CASE("tile_grid: we can move row of tiles",
-	"[x][tile_grid]") {
+	"[tile_grid]") {
 	// SETUP
 	int tiles[4] = {1, 2, 3, 4};
 	vector<int *> tile_list{
@@ -99,8 +99,25 @@ TEST_CASE("tile_grid: we can move row of tiles",
 	}
 }
 
-TEST_CASE("we can move front column tiles to back") {
+TEST_CASE("we can move front column tiles to back",
+	"[x][tile_grid]") {
 	// TODO: implement
+
+	// SETUP
+	int tiles[4] = {1, 2, 3, 4};
+	vector<int *> tile_list{
+		&tiles[0], &tiles[1],
+		&tiles[2], &tiles[3]};
+
+	tile_grid grid{2, 2, tiles};
+
+	vector<int *> const expected_front_col{&tiles[1], &tiles[3]},
+		expected_back_col{&tiles[0], &tiles[2]};
+
+	// ACT & CHECK
+	grid.move_front_column_back();
+	REQUIRE(grid.front_column() == expected_front_col);
+	REQUIRE(grid.back_column() == expected_back_col);
 }
 
 TEST_CASE("we can move back column tiles to front") {
