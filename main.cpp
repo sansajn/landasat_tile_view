@@ -32,24 +32,6 @@ constexpr char app_title[] = "ltview (Landsat Tile Viewer)";
 
 constexpr int default_zvalue = 100;
 
-
-class map_graphics_view : public QGraphicsView {  // TODO: move to map_view module
-public:
-	map_graphics_view(size_t width, size_t height, tiff_tiled_file const & tiff, QGraphicsScene & scene);
-
-protected:
-	void mouseMoveEvent(QMouseEvent * event) override;  //!< \note left/right/midddle mouse button must be pressed to receive event
-	void mousePressEvent(QMouseEvent * event) override;
-	void mouseReleaseEvent(QMouseEvent * event) override;
-
-private:
-	void pan_by(QPointF pos);  //!< Translate/pan view by \c pos position.
-
-	QPointF _mouse_click_pos;
-	vector<index_tile_item *> _tiles;  //!< list of tiles visible in view
-};
-
-
 map_graphics_view::map_graphics_view(size_t width, size_t height, tiff_tiled_file const & tiff, QGraphicsScene & scene) {
 	// populate view by tile items
 	size_t const tile_count_x = ceil((float)width / tile_size),  // TODO: use more tiles to suppor smooth scrolling
