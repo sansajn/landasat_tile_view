@@ -13,6 +13,8 @@ find_package(Boost 1.74 REQUIRED)
 find_package(spdlog 1.9.2 REQUIRED)
 find_package(Catch2 2.13 REQUIRED)
 
+add_compile_options(-Wall -Wextra)  # add extra warnings
+
 add_executable(ltview
 	main.cpp
 	tile_item.hpp

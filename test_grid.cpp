@@ -11,7 +11,7 @@ TEST_CASE("we can test with catch2", "[catch]") {
 
 // unit tests for tile_grid implementation
 
-TEST_CASE("we can create tile grid from list of tiles",
+TEST_CASE("tile_grid: we can create grid from list of tiles",
 	"[tile_grid") {
 	// SETUP
 	int tiles[4] = {1, 2, 3, 4};
@@ -24,48 +24,79 @@ TEST_CASE("we can create tile grid from list of tiles",
 	REQUIRE(true);
 }
 
-// TODO: can be merged to single test case
-TEST_CASE("we can get front row tiles",
+TEST_CASE("tile_grid: we can get row of tiles",
 	"[tile_grid]") {
-
 	// SETUP
 	int tiles[4] = {1, 2, 3, 4};
 	vector<int *> tile_list{
 		&tiles[0], &tiles[1],
 		&tiles[2], &tiles[3]};
 
-	vector<int *> const expected{&tiles[0], &tiles[1]};
+	tile_grid grid{2, 2, tiles};
+
+	// ACT & CHECK
+	SECTION("from front") {
+		vector<int *> const expected{&tiles[0], &tiles[1]};
+		vector<int *> row = grid.front_row();
+		REQUIRE(row == expected);
+	}
+
+	SECTION("from back") {
+		vector<int *> const expected{&tiles[2], &tiles[3]};
+		vector<int *> row = grid.back_row();
+		REQUIRE(row == expected);
+	}
+}
+
+TEST_CASE("tile_grid: we can get column of tiles",
+	"[tile_grid]") {
+	// SETUP
+	int tiles[4] = {1, 2, 3, 4};
+	vector<int *> tile_list{
+		&tiles[0], &tiles[1],
+		&tiles[2], &tiles[3]};
 
 	tile_grid grid{2, 2, tiles};
 
-	// ACT
-	vector<int *> row = grid.front_row();
+	// ACT & CHECK
+	SECTION("from front") {
+		vector<int *> const expected{&tiles[0], &tiles[2]};
+		vector<int *> col = grid.front_column();
+		REQUIRE(col == expected);
+	}
 
-	// CHECK
-	REQUIRE(row == expected);
+	SECTION("from back") {
+		vector<int *> const expected{&tiles[1], &tiles[3]};
+		vector<int *> col = grid.back_column();
+		REQUIRE(col == expected);
+	}
 }
 
-TEST_CASE("we can get back row tiles") {
-	// TODO: implement
-}
+TEST_CASE("tile_grid: we can move row of tiles",
+	"[x][tile_grid]") {
+	// SETUP
+	int tiles[4] = {1, 2, 3, 4};
+	vector<int *> tile_list{
+		&tiles[0], &tiles[1],
+		&tiles[2], &tiles[3]};
 
-TEST_CASE("we can get front column tiles") {
-	// TODO: implement
-}
+	tile_grid grid{2, 2, tiles};
 
-TEST_CASE("we can get back column tiles") {
-	// TODO: implement
-}
+	vector<int *> const expected_front_row{&tiles[2], &tiles[3]},
+		expected_back_row{&tiles[0], &tiles[1]};
 
+	// ACT & CHECK
+	SECTION("from front to back") {
+		grid.move_front_row_back();
+		REQUIRE(grid.front_row() == expected_front_row);
+		REQUIRE(grid.back_row() == expected_back_row);
+	}
 
-
-// TODO: can be merged to single test case
-TEST_CASE("we can move front row tiles to back") {
-	// TODO: implement
-}
-
-TEST_CASE("we can move back row tiles to front") {
-	// TODO: implement
+	SECTION("from back to front") {
+		grid.move_back_row_front();
+		REQUIRE(grid.front_row() == expected_front_row);
+		REQUIRE(grid.back_row() == expected_back_row);
+	}
 }
 
 TEST_CASE("we can move front column tiles to back") {
