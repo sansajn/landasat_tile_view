@@ -1,5 +1,7 @@
 #pragma once
+#include <algorithm>
 #include <deque>
+#include <vector>
 #include <cassert>
 
 /*! Grid of tiles on scren.
@@ -8,6 +10,8 @@ template <typename Tile>
 class tile_grid {
 public:
 	tile_grid(size_t rows, size_t cols, Tile * tiles);  // TODO: do not use raw pointers there, using tiles is error prome
+	std::vector<Tile *> front_row() const;
+
 
 private:
 	using grid_row = std::deque<Tile *>;
@@ -28,4 +32,12 @@ tile_grid<Tile>::tile_grid(size_t rows, size_t cols, Tile * tiles) {
 	}
 
 	assert(std::size(_tiles) == rows);
+}
+
+template <typename Tile>
+std::vector<Tile *> tile_grid<Tile>::front_row() const {
+	auto & front = _tiles.front();
+	std::vector<Tile *> result(std::size(front));
+	std::copy(begin(front), end(front), begin(result));
+	return result;
 }
