@@ -1,11 +1,10 @@
 #include <spdlog/spdlog.h>
 #include "map_view.hpp"
 
-constexpr size_t tile_size = 256;  // FIXME: use tiff.size() instead
-
 map_graphics_view::map_graphics_view(size_t width, size_t height, tiff_tiled_file const & tiff, QGraphicsScene & scene) {
 	// populate view by tile items
-	size_t const tile_count_x = ceil((float)width / tile_size),  // TODO: use more tiles to suppor smooth scrolling
+	size_t const tile_size = tiff.tile_size(),
+		tile_count_x = ceil((float)width / tile_size),  // TODO: use more tiles to suppor smooth scrolling
 		tile_count_y = ceil((float)height / tile_size);
 
 	_tiles.reserve(tile_count_y * tile_count_y);
@@ -23,7 +22,7 @@ map_graphics_view::map_graphics_view(size_t width, size_t height, tiff_tiled_fil
 }
 
 void map_graphics_view::mouseMoveEvent(QMouseEvent * event) {
-	QPoint pos = event->pos();  // pozicia vo widgete
+	QPoint pos = event->pos();  // widget position
 	QPointF screen_pos = event->screenPos();
 	QPointF position = event->position();
 	spdlog::info("mouse moved: view-pos=({},{}), screen-pos=({},{}), position=({},{})", pos.x(), pos.y(), screen_pos.x(), screen_pos.y(), position.x(), position.y());
@@ -49,7 +48,6 @@ void map_graphics_view::mousePressEvent(QMouseEvent * event) {
 void map_graphics_view::mouseReleaseEvent(QMouseEvent * event) {
 	QGraphicsView::mouseReleaseEvent(event);
 }
-
 
 void map_graphics_view::pan_by(QPointF pos) {
 	for (index_tile_item * tile : _tiles) {
