@@ -43,7 +43,7 @@ public:
 
 		for (size_t y = 0; y < tile_count_y; ++y) {
 			for (size_t x = 0; x < tile_count_x; ++x) {
-				checker_tile_item * tile = new checker_tile_item{300 + y*tile_count_y + x};  // TODO: handle tile-idx
+				index_tile_item * tile = new index_tile_item{300 + y*tile_count_x + x};  // TODO: handle tile-idx
 				_tiles.push_back(tile);
 				QTransform T;
 				T.translate(x * tile_size, y * tile_size);
@@ -78,7 +78,7 @@ protected:
 			spdlog::info("view moved by: ({},{})", dp.x(), dp.y());
 			// TODO: we want there to change tile positions for testing purpose
 
-			for (checker_tile_item * tile : _tiles) {
+			for (index_tile_item * tile : _tiles) {
 				QTransform T;
 				T.translate(dp.x(), dp.y());
 				tile->setTransform(T, true);  // NOTE: we assume there is not any rotation there
@@ -93,7 +93,7 @@ private:
 	void pan_by(QPointF pos);  //!< translate/pan view by \c pos position TODO: implement
 
 	QPointF _mouse_click_pos;
-	vector<checker_tile_item *> _tiles;  //!< list of tiles visible in view
+	vector<index_tile_item *> _tiles;  //!< list of tiles visible in view
 };
 
 
